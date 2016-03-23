@@ -9,6 +9,7 @@ import React, {
   StyleSheet,
   Text,
   View,
+  Image,
   TextInput,
   TouchableHighlight,
   NativeModules,
@@ -18,10 +19,49 @@ import {
   getBest
 } from './spotify.js'
 
+import SpeechAndroid from 'react-native-android-voice';
+
+var AlbumRow = (props) => {
+  var album = props.album;
+  var image = album.images.reduce((prev, cur) => {
+    return prev.height < cur.height ? prev : cur
+  });
+  return (
+    <View style={styles.albumContainer}>
+      <Image
+        source={{uri: image.url}}
+        style={{
+          width: image.width,
+          height: image.height
+        }}
+      />
+      <View style={styles.rightContainer}>
+        <Text style={styles.title}>
+          {album.name}
+        </Text>
+        <Text style={styles.subtitle}>{album.artists[0].name}</Text>
+      </View>
+    </View>
+  )
+}
+
 class AwesomeProject extends Component {
   constructor(props) {
     super(props);
-    this.state = {text: ""};
+    this.state = {
+      text: "",
+      albums: [{
+        images: [{
+          url: 'https://i.scdn.co/image/125521548f6a4bf771611c3cb42e00ab1dd753a4',
+          width: 64,
+          height: 64,
+        }],
+        name: 'Feels',
+        artists: [{
+          name: 'Animal Collective'
+        }]
+      }]
+    };
   }
 
   render() {
@@ -41,8 +81,30 @@ class AwesomeProject extends Component {
             Search
           </Text>
         </TouchableHighlight>
+        <TouchableHighlight
+          onPress={this.onVoicePress.bind(this)}
+          style={styles.button}
+          underlayColor="grey">
+          <Text>
+            Speak
+          </Text>
+        </TouchableHighlight>
+        <View style={styles.listContainer}>
+          {
+            this.state.albums.map((a,i) => <AlbumRow album={a} key={i} />)
+          }
+        </View>
+
       </View>
     );
+  }
+
+  onVoicePress() {
+    SpeechAndroid.startSpeech("enter search", SpeechAndroid.DEFAULT).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      console.log(err);
+    });
   }
 
   onPress() {
@@ -54,6 +116,13 @@ class AwesomeProject extends Component {
       if(!data || !data.tracks){
         return;
       }
+      console.log(data)
+      if(data.album_type) {
+        this.setState({
+          albums: [data]
+        })
+      }
+
       var items = data.tracks.items ? data.tracks.items : data.tracks;
       var ids = items.map((track) => track.id).join(',');
       //console.log(ids)
@@ -74,7 +143,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },
   welcome: {
@@ -96,6 +165,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#d3d3d3',
+  },
+  albumContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  listContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  rightContainer: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

@@ -68,13 +68,13 @@ export function getBest(query: string) {
 
     console.log('got distanes')
 
-    if (artistDistance < albumDistance && artistDistance < trackDistance) {
+    if (artistDistance <= albumDistance && artistDistance <= trackDistance) {
       console.log('get artists')
       return getArtistTracks(artist);
-    } else if(albumDistance < artistDistance && albumDistance < trackDistance) {
+    } else if(albumDistance <= artistDistance && albumDistance <= trackDistance) {
       console.log('get albums')
       return getAlbumTracks(album);
-    } else if(trackDistance < artistDistance && trackDistance < albumDistance) {
+    } else if(trackDistance <= artistDistance && trackDistance <= albumDistance) {
       console.log('get artists')
       return Promise.resolve({tracks: [track]});
     }
