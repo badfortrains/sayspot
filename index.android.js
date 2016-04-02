@@ -12,128 +12,232 @@ import React, {
   Image,
   TextInput,
   TouchableHighlight,
+  ListView,
   NativeModules,
+  DeviceEventEmitter,
+  AsyncStorage,
+  ProgressBarAndroid,
+  Animated,
+  Dimensions,
+  TouchableOpacity,
+  Picker
 } from 'react-native';
 
-import {
-  getBest
-} from './spotify.js'
+var {
+  height: deviceHeight
+} = Dimensions.get('window');
 
-import SpeechAndroid from 'react-native-android-voice';
+var TimerMixin = require('react-timer-mixin');
 
-var AlbumRow = (props) => {
-  var album = props.album;
-  var image = album.images.reduce((prev, cur) => {
-    return prev.height < cur.height ? prev : cur
-  });
-  return (
-    <View style={styles.albumContainer}>
-      <Image
-        source={{uri: image.url}}
-        style={{
-          width: image.width,
-          height: image.height
-        }}
-      />
-      <View style={styles.rightContainer}>
-        <Text style={styles.title}>
-          {album.name}
-        </Text>
-        <Text style={styles.subtitle}>{album.artists[0].name}</Text>
-      </View>
-    </View>
-  )
+var MovingBar = React.createClass({
+  mixins: [TimerMixin],
+
+  getInitialState: function() {
+    return {
+      progress: 0,
+    };
+  },
+
+  componentDidMount: function() {
+    this.setInterval(
+      () => {
+        var progress = (this.state.progress + 0.02) % 1;
+        this.setState({progress: progress});
+      }, 25
+    );
+  },
+
+  render: function() {
+    return <ProgressBarAndroid progress={this.state.progress} {...this.props} />;
+  },
+});
+
+class Modal extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      offset: new Animated.Value(deviceHeight),
+      opacity: new Animated.Value(0),
+    };
+  }
+
+  componentDidMount() {
+    this.state.offset.setValue(deviceHeight);
+    Animated.parallel([
+      Animated.timing(this.state.offset, {
+        toValue: 0,
+        duration: 300
+      }),
+      Animated.timing(this.state.opacity, {
+        toValue: 1,
+        duration: 300
+      })
+    ]).start();
+
+    this.props.closePromise &&
+        this.props.closePromise.then(() => this.closeModal());
+  }
+
+  closeModal() {
+    Animated.parallel([
+      Animated.timing(this.state.offset, {
+        toValue: deviceHeight,
+        duration: 300,
+      }),
+      Animated.timing(this.state.opacity, {
+        toValue: 0,
+        duration: 300,
+      })
+    ]).start(this.props.closeModal);
+  }
+
+  render() {
+    return (
+        <Animated.View style={[styles.modal, styles.flexCenter, {opacity: this.state.opacity}]}>
+          <Animated.View style={[styles.modalBox, {transform: [{translateY: this.state.offset}]}]}>
+            {React.Children.only(this.props.children)}
+          </Animated.View>
+        </Animated.View>
+    )
+  }
 }
 
 class AwesomeProject extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: "",
-      albums: [{
-        images: [{
-          url: 'https://i.scdn.co/image/125521548f6a4bf771611c3cb42e00ab1dd753a4',
-          width: 64,
-          height: 64,
-        }],
-        name: 'Feels',
-        artists: [{
-          name: 'Animal Collective'
-        }]
-      }]
+      username: '',
+      password: '',
+      blob: '',
+      showModal: false,
+      devices: []
     };
   }
 
   render() {
     return (
       <View style={styles.container}>
+        <Text> Username </Text>
         <TextInput
           style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-          onChangeText={(text) => this.setState({text})}
-          onSubmitEditing={this.onPress.bind(this)}
+          onChangeText={(text) => this.setState({username: text})}
+          value={this.state.text}
+        />
+        <Text> Password </Text>
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({password: text})}
+          onSubmitEditing={this.onLoginPress.bind(this)}
           value={this.state.text}
         />
         <TouchableHighlight
-          onPress={this.onPress.bind(this)}
+          onPress={this.onLoginPress.bind(this)}
           style={styles.button}
           underlayColor="grey">
           <Text>
-            Search
+            Login
           </Text>
         </TouchableHighlight>
         <TouchableHighlight
-          onPress={this.onVoicePress.bind(this)}
+          onPress={this.onDiscoverPress.bind(this)}
           style={styles.button}
           underlayColor="grey">
           <Text>
-            Speak
+            Discover
           </Text>
         </TouchableHighlight>
-        <View style={styles.listContainer}>
+        {this.state.showModal ?
+          <Modal closeModal={() => this.setState({showModal: false})}
+                 closePromise={this.state.loginPromise}>
+            <View>
+              <TouchableOpacity onPress={() => this.closeModal()}>
+                <Text style={{color: '#000'}}>Close Menu</Text>
+              </TouchableOpacity>
+              <MovingBar color="blue"></MovingBar>
+            </View>
+          </Modal>
+          :
+          null
+        }
+        <Picker
+          onValueChange={(i) => this.onSelect(i)}
+          selectedValue={this.state.selected || 0}>
           {
-            this.state.albums.map((a,i) => <AlbumRow album={a} key={i} />)
+            this.state.devices.map((d, i) =>
+              <Picker.Item label={d.Name} value={i} key={i}/>
+            )
           }
-        </View>
-
+        </Picker>
       </View>
     );
   }
 
-  onVoicePress() {
-    SpeechAndroid.startSpeech("enter search", SpeechAndroid.DEFAULT).then((res) => {
-      console.log(res);
-    }).catch((err) => {
-      console.log(err);
+  onSelect(i) {
+     this.setState({selected: i});
+     var device = this.state.devices[i];
+     console.log('select', device)
+     if (device.Url) {
+       NativeModules.SpotAndroid.connectToDevice(device.Url)
+     }
+  }
+
+  onLoginPress() {
+    Promise.all([
+      AsyncStorage.getItem('username'),
+      AsyncStorage.getItem('decodedBlob'),
+    ])
+    .then((values) => NativeModules.SpotAndroid.loginBlob(values[0], values[1]))
+    .then(()=> NativeModules.SpotAndroid.getUpdates())
+    .catch(() => console.log("catch"))
+
+    DeviceEventEmitter.addListener('SpotDeviceNotify', (data) => {
+      console.log("data", data)
+      var update = JSON.parse(data);
+
+      console.log(update)
+
+      if (!this.state.devices.find((d) => d.Ident == update.Ident)) {
+        this.getDevices();
+      }
+    });
+
+
+    //this.setState({showModal: true})
+    //NativeModules.SpotAndroid.login(this.state.username, this.state.password);
+  }
+
+  getDevices() {
+    return Promise.all([
+        NativeModules.SpotAndroid.listMdnsDevices(),
+        NativeModules.SpotAndroid.listDevices()
+    ]).then((values) => {
+      var mdns = JSON.parse(values[0])
+      var connect = JSON.parse(values[1])
+      this.setState({
+        devices: connect.concat(mdns)
+      })
     });
   }
 
-  onPress() {
-    var x = NativeModules.SpotAndroid
-    var ident = '2cc436bd6a996b61866a07c7a6ac3e1511cd1d46';
-
-    getBest(this.state.text).then((data) => {
-      //console.log('got data', data)
-      if(!data || !data.tracks){
-        return;
-      }
-      console.log(data)
-      if(data.album_type) {
+  onDiscoverPress() {
+    var loginPromise = NativeModules.SpotAndroid.startDiscovery()
+      .then((blob) => {
+        console.log('got blob', blob)
         this.setState({
-          albums: [data]
-        })
-      }
-
-      var items = data.tracks.items ? data.tracks.items : data.tracks;
-      var ids = items.map((track) => track.id).join(',');
-      //console.log(ids)
-      x.loadTracks(ident, ids);
-      x.play(ident);
+          username: blob.username,
+          blob: blob.blob
+        });
+        return Promise.all([
+          AsyncStorage.setItem('decodedBlob', blob.blob),
+          AsyncStorage.setItem('username', blob.username),
+          NativeModules.SpotAndroid.loginBlob(blob.username, blob.blob)
+        ]);
+      }).then(() => this.getDevices());
+    this.setState({
+      loginPromise: loginPromise,
+      showModal: true
     })
 
-    // x.loadTracks(ident, '2nMW1mZmdIt5rZCsX1uh9J')
-    // x.play(ident);
-    //Math.random() > 0.5 ? x.play(ident) : x.pause(ident)
-    //console.error(this.state)
   }
 }
 
@@ -175,7 +279,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'flex-start',
   },
   rightContainer: {
@@ -190,6 +294,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+  flexCenter: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modal: {
+    backgroundColor: 'rgba(0,0,0,.8)',
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0
+  },
+  modalBox: {
+    position: 'absolute',
+    backgroundColor: 'rgb(256, 256, 256)',
+    right: 0,
+    left: 0,
+    top: 100,
+    height: 300
+  }
 });
 
 AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject);
