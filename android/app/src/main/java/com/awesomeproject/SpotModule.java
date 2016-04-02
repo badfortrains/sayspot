@@ -73,6 +73,7 @@ public class SpotModule extends ReactContextBaseJavaModule {
             public void run() {
                 mService.Login(username, password);
                 promise.resolve("true");
+                SpotModule.this.getUpdates();
             }
         }).start();
     }
@@ -83,7 +84,9 @@ public class SpotModule extends ReactContextBaseJavaModule {
             public void run() {
                 mService.LoginBlob(username, blob);
                 promise.resolve("true");
+                SpotModule.this.getUpdates();
             }
+
         }).start();
     }
 
@@ -114,11 +117,7 @@ public class SpotModule extends ReactContextBaseJavaModule {
     }
 
 
-    @ReactMethod
-    public void getUpdates(Promise promise){
-        if (!checkController(promise)){
-            return;
-        }
+    private void getUpdates(){
         mService.mController.HandleUpdates(new Spotcontrol.Updater.Stub() {
             public void OnUpdate(String s) {
                 reactContext
@@ -126,7 +125,6 @@ public class SpotModule extends ReactContextBaseJavaModule {
                         .emit("SpotDeviceNotify", s);
             }
         });
-        promise.resolve("true");
     }
 
     @ReactMethod
@@ -169,7 +167,19 @@ public class SpotModule extends ReactContextBaseJavaModule {
         }
         Log.i(TAG, "Spot play");
         mService.mController.SendPlay(ident);
+        promise.resolve("true");
     }
+
+    @ReactMethod
+    public void hello(Promise promise) {
+        if (!checkController(promise)){
+            return;
+        }
+        Log.i(TAG, "Spot play");
+        mService.mController.SendHello();
+        promise.resolve("true");
+    }
+
 
     @ReactMethod
     public void pause(String ident, Promise promise) {
@@ -178,6 +188,7 @@ public class SpotModule extends ReactContextBaseJavaModule {
         }
         Log.i(TAG, "Spot pause");
         mService.mController.SendPause(ident);
+        promise.resolve("true");
     }
 
     @ReactMethod

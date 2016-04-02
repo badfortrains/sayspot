@@ -13,7 +13,6 @@ import React, {
   TextInput,
   TouchableHighlight,
   ListView,
-  NativeModules,
   DeviceEventEmitter,
   AsyncStorage,
   ProgressBarAndroid,
@@ -22,6 +21,10 @@ import React, {
   TouchableOpacity,
   Picker
 } from 'react-native';
+
+import spotcontrol from './spotcontrol.js'
+
+import Search from './search.js'
 
 var {
   height: deviceHeight
@@ -114,6 +117,12 @@ class AwesomeProject extends Component {
     };
   }
 
+  componentDidMount() {
+    DeviceEventEmitter.addListener('SpotDeviceAdd', (devices) => {
+      this.setState({devices: devices})
+    })
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -160,24 +169,25 @@ class AwesomeProject extends Component {
           null
         }
         <Picker
-          onValueChange={(i) => this.onSelect(i)}
-          selectedValue={this.state.selected || 0}>
+          onValueChange={(ident) => this.onSelect(ident)}
+          selectedValue={this.state.selected}>
           {
-            this.state.devices.map((d, i) =>
-              <Picker.Item label={d.Name} value={i} key={i}/>
+            this.state.devices.map((d) =>
+              <Picker.Item label={d.name} value={d.ident} key={d.ident}/>
             )
           }
         </Picker>
+        <Search ident={this.state.selected}></Search>
       </View>
     );
   }
 
-  onSelect(i) {
-     this.setState({selected: i});
-     var device = this.state.devices[i];
+  onSelect(ident) {
+     this.setState({selected: ident});
+     var device = this.state.devices.find((d) => d.ident == ident);
      console.log('select', device)
      if (device.Url) {
-       NativeModules.SpotAndroid.connectToDevice(device.Url)
+       spotcontrol.connectToDevice(device.Url)
      }
   }
 
@@ -186,20 +196,24 @@ class AwesomeProject extends Component {
       AsyncStorage.getItem('username'),
       AsyncStorage.getItem('decodedBlob'),
     ])
-    .then((values) => NativeModules.SpotAndroid.loginBlob(values[0], values[1]))
-    .then(()=> NativeModules.SpotAndroid.getUpdates())
-    .catch(() => console.log("catch"))
+    .then((values) => spotcontrol.loginBlob(values[0], values[1]))
+    .then(() => this.getDevices())
 
-    DeviceEventEmitter.addListener('SpotDeviceNotify', (data) => {
-      console.log("data", data)
-      var update = JSON.parse(data);
 
-      console.log(update)
+    //then(() =>
+    // .then(()=> NativeModules.SpotAndroid.getUpdates())
+    // .catch(() => console.log("catch"))
 
-      if (!this.state.devices.find((d) => d.Ident == update.Ident)) {
-        this.getDevices();
-      }
-    });
+    // DeviceEventEmitter.addListener('SpotDeviceNotify', (data) => {
+    //   console.log("data", data)
+    //   var update = JSON.parse(data);
+    //
+    //   console.log(update)
+    //
+    //   if (!this.state.devices.find((d) => d.Ident == update.Ident)) {
+    //     this.getDevices();
+    //   }
+    // });
 
 
     //this.setState({showModal: true})
@@ -207,20 +221,17 @@ class AwesomeProject extends Component {
   }
 
   getDevices() {
-    return Promise.all([
-        NativeModules.SpotAndroid.listMdnsDevices(),
-        NativeModules.SpotAndroid.listDevices()
-    ]).then((values) => {
-      var mdns = JSON.parse(values[0])
-      var connect = JSON.parse(values[1])
-      this.setState({
-        devices: connect.concat(mdns)
+    setTimeout(() => {
+      spotcontrol.getDevices()
+      .then((devices) => {
+        console.log('got devices', devices)
+        this.setState({devices: devices})
       })
-    });
+    },1000);
   }
 
   onDiscoverPress() {
-    var loginPromise = NativeModules.SpotAndroid.startDiscovery()
+    var loginPromise = spotcontrol.startDiscovery()
       .then((blob) => {
         console.log('got blob', blob)
         this.setState({
@@ -230,7 +241,7 @@ class AwesomeProject extends Component {
         return Promise.all([
           AsyncStorage.setItem('decodedBlob', blob.blob),
           AsyncStorage.setItem('username', blob.username),
-          NativeModules.SpotAndroid.loginBlob(blob.username, blob.blob)
+          spotcontrol.loginBlob(blob.username, blob.blob)
         ]);
       }).then(() => this.getDevices());
     this.setState({

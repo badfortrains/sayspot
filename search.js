@@ -21,6 +21,8 @@ import {
   getBest
 } from './spotify.js'
 
+import spotcontrol from './spotcontrol.js'
+
 import SpeechAndroid from 'react-native-android-voice';
 
 var AlbumRow = (props) => {
@@ -99,7 +101,7 @@ var TrackRow = (props) => {
 
 
 
-class AwesomeProject extends Component {
+class Search extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -134,14 +136,6 @@ class AwesomeProject extends Component {
             Speak
           </Text>
         </TouchableHighlight>
-        <TouchableHighlight
-          onPress={this.onDiscoverPress.bind(this)}
-          style={styles.button}
-          underlayColor="grey">
-          <Text>
-            Discover
-          </Text>
-        </TouchableHighlight>
         <View style={styles.listContainer}>
           {
             this.state.items ?
@@ -159,11 +153,6 @@ class AwesomeProject extends Component {
     );
   }
 
-  onDiscoverPress() {
-    NativeModules.SpotAndroid.startDiscovery()
-        .then((blob) => console.log('got blob', blob));
-  }
-
   onVoicePress() {
     SpeechAndroid.startSpeech("enter search", SpeechAndroid.DEFAULT).then((res) => {
       this.setState({text: res});
@@ -174,45 +163,34 @@ class AwesomeProject extends Component {
   }
 
   onPress() {
-    var x = NativeModules.SpotAndroid
-    x.listMdnsDevices().then((data) => {
-      console.log(data);
-      var devices = JSON.parse(data);
-      console.log(devices);
+    var ident = this.props.ident
+
+    getBest(this.state.text).then((data) => {
+      //console.log('got data', data)
+      if(!data || !data.tracks){
+        return;
+      }
+      console.log(data)
+      var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+      if(data.album_type) {
+        this.setState({
+          Component: AlbumRow,
+          items: ds.cloneWithRows([data]),
+        })
+      } else {
+        this.setState({
+          Component: TrackRow,
+          items: ds.cloneWithRows(data.tracks)
+        })
+      }
+
+      var items = data.tracks.items ? data.tracks.items : data.tracks;
+      var ids = items.map((track) => track.id).join(',');
+      //console.log(ids)
+      spotcontrol.loadTracks(ident, ids)
+      .then(() => spotcontrol.play(ident));
+      ;
     })
-    DeviceEventEmitter.addListener('SpotDeviceNotify', (data) => {
-      var update = JSON.parse(data);
-      console.log(update)
-    });
-    x.getUpdates();
-    //var ident = '2cc436bd6a996b61866a07c7a6ac3e1511cd1d46';
-    // var ident = '00:05:CD:44:EA:E0';
-    //
-    // getBest(this.state.text).then((data) => {
-    //   //console.log('got data', data)
-    //   if(!data || !data.tracks){
-    //     return;
-    //   }
-    //   console.log(data)
-    //   var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    //   if(data.album_type) {
-    //     this.setState({
-    //       Component: AlbumRow,
-    //       items: ds.cloneWithRows([data]),
-    //     })
-    //   } else {
-    //     this.setState({
-    //       Component: TrackRow,
-    //       items: ds.cloneWithRows(data.tracks)
-    //     })
-    //   }
-    //
-    //   var items = data.tracks.items ? data.tracks.items : data.tracks;
-    //   var ids = items.map((track) => track.id).join(',');
-    //   //console.log(ids)
-    //   x.loadTracks(ident, ids);
-    //   x.play(ident);
-    // })
 
     // x.loadTracks(ident, '2nMW1mZmdIt5rZCsX1uh9J')
     // x.play(ident);
@@ -276,4 +254,4 @@ const styles = StyleSheet.create({
   },
 });
 
-AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject);
+export default Search;
