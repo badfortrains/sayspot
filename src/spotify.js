@@ -43,13 +43,13 @@ function getEditDistance(a, b){
   return matrix[b.length][a.length];
 };
 
-function getAlbumTracks(album){
+export function getAlbumTracks(album){
   var url = `https://api.spotify.com/v1/albums/${album.id}?market=US`
   console.log(url)
   return fetch(url).then((res) => res.json())
 }
 
-function getArtistTracks(artist){
+export function getArtistTracks(artist){
   var url = `https://api.spotify.com/v1/artists/${artist.id}/top-tracks?country=US`
   console.log(url)
   return fetch(url).then((res) => res.json())

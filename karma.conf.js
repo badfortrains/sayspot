@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'tests/**.js'
+      'src/tests/tests.webpack.js' //just load this file
     ],
 
 
@@ -27,20 +27,25 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        'src/**/*.js': ['babel'],
+      'src/tests/tests.webpack.js': [ 'webpack', 'sourcemap' ] //preprocess with webpack and our sourcemap loader
     },
 
-    babelPreprocessor: {
-      options: {
-        presets: ['es2015'],
-        sourceMap: 'inline'
-      },
-      filename: function (file) {
-        return file.originalPath.replace(/\.js$/, '.es5.js');
-      },
-      sourceFileName: function (file) {
-        return file.originalPath;
+    webpack: { //kind of a copy of your webpack config
+      devtool: 'inline-source-map', //just do inline source maps instead of the default
+      module: {
+        loaders: [
+          { test: /\.js$/, 
+            loader: 'babel-loader',
+            exclude: /(node_modules|bower_components)/,
+            query: {
+                presets: ['es2015', 'stage-2', 'react']
+            }
+          }
+        ]
       }
+    },
+    webpackServer: {
+      noInfo: true //please don't spam the console when running in karma!
     },
 
     // test results reporter to use
