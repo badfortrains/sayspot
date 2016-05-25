@@ -118,7 +118,7 @@ public class SpotModule extends ReactContextBaseJavaModule {
 
 
     private void getUpdates(){
-        mService.mController.HandleUpdates(new Spotcontrol.Updater.Stub() {
+        mService.mController.HandleUpdates(new Spotcontrol.Updater() {
             public void OnUpdate(String s) {
                 reactContext
                         .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
@@ -147,7 +147,7 @@ public class SpotModule extends ReactContextBaseJavaModule {
                 multicastLock.setReferenceCounted(true);
                 multicastLock.acquire();
 
-                Spotcontrol.BlobInfo b = Spotcontrol.BlobFromDiscovery();
+                Spotcontrol.BlobInfo b = Spotcontrol.BlobFromDiscovery("spotcontrol");
                 WritableMap map = Arguments.createMap();
                 map.putString("username", b.getUsername());
                 map.putString("blob", b.getDecodedBlob());

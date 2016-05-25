@@ -35,12 +35,12 @@ public class SpotService extends Service {
 
     public void Login(String username, String password) {
         byte[] key = Base64.decode("Abr6PKmtx6ABxGwigiq/K/3pnj+pt9ZIT2JPuby/Edzz6BMhzvq3xk/A1KHIWsWl2pnf+vY0PyH1L7I7Vw2tRb9/xtPHCmxNxqr6Yo+U+7XuEt+9l2ob7bnIpRgr9dtPmD3zTAgKm4sJP3DzezzVv/Btg2HgdYpU4AH9qoMMMDJIUMzdI7r2LWUXoUk+BDb3vJoEtDYnP+cUl99epsAfJU2Hzgb6sr5NTQwMiSq5JOm79T3xatAS6PVJM+cFBD/sSq5rxW0IzlDHOTr9dUZavChwBjojg2aN+igIl5aKIBcWiKvBbmjxKM3Rdebq6FYSegv6TTNqIEcsUEehKCQmozEsHsr581UX6DM1H7bG1hcF72j70Dq0vhexzmr8v+p2HLbw553/1oxJ3p3I5/mCUTBOYLp4sO3U8Y9WZoKa6zdy", Base64.DEFAULT);
-        mController = Spotcontrol.LoginWithKey(username, password, key);
+        mController = Spotcontrol.LoginWithKey(username, password, key, "spotcontrol");
     }
 
     public void LoginBlob(String username, String blob) {
         byte[] key = Base64.decode("Abr6PKmtx6ABxGwigiq/K/3pnj+pt9ZIT2JPuby/Edzz6BMhzvq3xk/A1KHIWsWl2pnf+vY0PyH1L7I7Vw2tRb9/xtPHCmxNxqr6Yo+U+7XuEt+9l2ob7bnIpRgr9dtPmD3zTAgKm4sJP3DzezzVv/Btg2HgdYpU4AH9qoMMMDJIUMzdI7r2LWUXoUk+BDb3vJoEtDYnP+cUl99epsAfJU2Hzgb6sr5NTQwMiSq5JOm79T3xatAS6PVJM+cFBD/sSq5rxW0IzlDHOTr9dUZavChwBjojg2aN+igIl5aKIBcWiKvBbmjxKM3Rdebq6FYSegv6TTNqIEcsUEehKCQmozEsHsr581UX6DM1H7bG1hcF72j70Dq0vhexzmr8v+p2HLbw553/1oxJ3p3I5/mCUTBOYLp4sO3U8Y9WZoKa6zdy", Base64.DEFAULT);
-        mController = Spotcontrol.LoginBlob(username, blob, key);
+        mController = Spotcontrol.LoginBlob(username, blob, key, "spotcontrol");
     }
 
     @Override
