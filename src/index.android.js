@@ -192,11 +192,15 @@ class AwesomeProject extends Component {
   }
 
   onLoginPress() {
+    AsyncStorage.clear()
     Promise.all([
       AsyncStorage.getItem('username'),
       AsyncStorage.getItem('decodedBlob'),
     ])
-    .then((values) => spotcontrol.loginBlob(values[0], values[1]))
+    .then((values) => {
+      console.log("vals", values)
+      return spotcontrol.loginBlob(values[0], values[1])
+    })
     .then(() => this.getDevices())
 
 

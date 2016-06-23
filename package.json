@@ -7,9 +7,12 @@
     "test": "./node_modules/karma/bin/karma start"
   },
   "dependencies": {
+    "react": "^15.1.0",
     "react-native": "^0.21.0",
     "react-native-android-voice": "^0.2.0",
-    "react-timer-mixin": "^0.13.3"
+    "react-redux": "^4.4.5",
+    "react-timer-mixin": "^0.13.3",
+    "redux": "^3.5.2"
   },
   "devDependencies": {
     "babel-core": "^6.9.0",
