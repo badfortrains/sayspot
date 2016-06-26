@@ -7,6 +7,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Loader from '../components/loader'
 import Login from '../components/login'
+import Button from '../components/button'
+import Link from '../containers/navLink'
 import * as settingsActions from '../actions/settings'
 
 import { ActivityIndicator } from 'react-native'
@@ -16,6 +18,7 @@ class Settings extends Component {
     const { settings, actions } = this.props
     return (
       <View>
+        <Link text="Home"></Link>
         {settings.status === "loading" ?
           <ActivityIndicator
             animating={true}

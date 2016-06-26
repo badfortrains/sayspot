@@ -2,7 +2,7 @@
 import { Provider } from 'react-redux'
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import React, { Component } from 'react'
-import Route from './route'
+import Route from './navigator'
 import reducer from '../reducers/index'
 
 import { asyncMiddleware } from '../actions/shared.js'
@@ -24,11 +24,13 @@ let store = createStore(reducer, {
     //logger
   ))
 
+
+
 export default class Root extends Component {
   render() {
     return (
     	<Provider store={store}>
-        <Route route={store.getState().route}></Route>
+        <Route></Route>
     	</Provider>
     );
   }
