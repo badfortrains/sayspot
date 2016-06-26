@@ -1,5 +1,6 @@
-import React, {
-  Component,
+// @flow
+import React, {Component} from 'react';
+import {
   StyleSheet,
   Text,
   View,
@@ -7,48 +8,69 @@ import React, {
   TouchableHighlight,
 } from 'react-native';
 
-class AwesomeProject extends Component {
+export default class AwesomeProject extends Component {
 
-  constructor() {
-    this.setState({
+  props: {
+    loginPassword: (u: string, p: string) => void,
+    loginDiscovery: () => void
+  };
+
+  state: {
+    username: string,
+    password: string
+  };
+
+  constructor(props: any, context: any) {
+    super(props, context)
+    this.state = {
       username: '',
       password: '',
-    })
-  }
+    };
+  };
 
   render() {
-    <View style={styles.container}>
-      <Text> Username </Text>
-      <TextInput
-        style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-        onChangeText={(text) => this.setState({username: text})}
-        value={this.state.text}
-      />
-      <Text> Password </Text>
-      <TextInput
-        style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-        onChangeText={(text) => this.setState({password: text})}
-        onSubmitEditing={this.onLoginPress.bind(this)}
-        value={this.state.text}
-      />
-      <TouchableHighlight
-        onPress={this.onLoginPress.bind(this)}
-        style={styles.button}
-        underlayColor="grey">
-        <Text>
-          Login
-        </Text>
-      </TouchableHighlight>
-      <TouchableHighlight
-        onPress={this.onDiscoverPress.bind(this)}
-        style={styles.button}
-        underlayColor="grey">
-        <Text>
-          Discover
-        </Text>
-      </TouchableHighlight>
-    </View>;
-  }
+    return (
+      <View style={styles.container}>
+        <Text> Username </Text>
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(username) => this.setState({username})}
+          value={this.state.username}
+        />
+        <Text> Password </Text>
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(password) => this.setState({password})}
+          onSubmitEditing={this.onLoginPress.bind(this)}
+          value={this.state.password}
+        />
+        <TouchableHighlight
+          onPress={this.onLoginPress.bind(this)}
+          style={styles.button}
+          underlayColor="grey">
+          <Text>
+            Login
+          </Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          onPress={this.onDiscoverPress.bind(this)}
+          style={styles.button}
+          underlayColor="grey">
+          <Text>
+            Discover
+          </Text>
+        </TouchableHighlight>
+      </View>
+    );
+  };
+
+  onLoginPress() {
+    this.props.loginPassword(this.state.username, this.state.password)
+  };
+
+  onDiscoverPress() {
+    this.props.loginDiscovery(this.state.username, this.state.password)
+  };
 }
 
 const styles = StyleSheet.create({

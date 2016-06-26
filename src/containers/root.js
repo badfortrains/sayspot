@@ -1,14 +1,34 @@
+/* @flow */
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { Component } from 'react-native'
+import { createStore, combineReducers, applyMiddleware } from 'redux'
+import React, { Component } from 'react'
+import Route from './route'
+import reducer from '../reducers/index'
 
-let store = createStore(todoApp)
+import { asyncMiddleware } from '../actions/shared.js'
 
-class Root extends Component {
+const logger = store => next => action => {
+  console.group(action.type)
+  console.info('dispatching', action)
+  let result = next(action)
+  console.log('next state', store.getState())
+  console.groupEnd(action.type)
+  return result
+}
+
+let store = createStore(reducer, {
+    route: {section: 'settings'}
+  },
+  applyMiddleware(
+    asyncMiddleware,
+    //logger
+  ))
+
+export default class Root extends Component {
   render() {
     return (
     	<Provider store={store}>
-
+        <Route route={store.getState().route}></Route>
     	</Provider>
     );
   }

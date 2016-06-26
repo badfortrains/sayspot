@@ -10,11 +10,6 @@ import java.util.List;
 
 public class MainActivity extends ReactActivity {
 
-    @Override
-    protected String getJSMainModuleName() {
-        return "src/index.android";
-    }
-
     /**
      * Returns the name of the main component registered from JavaScript.
      * This is used to schedule rendering of the component.
@@ -22,6 +17,11 @@ public class MainActivity extends ReactActivity {
     @Override
     protected String getMainComponentName() {
         return "AwesomeProject";
+    }
+
+    @Override
+    protected String getJSMainModuleName() {
+        return "src/index.android";
     }
 
     /**
@@ -40,7 +40,9 @@ public class MainActivity extends ReactActivity {
     @Override
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
-            new MainReactPackage(), new SpotPackage(),  new VoicePackage()
+                new MainReactPackage(),
+                new SpotPackage(),
+                new VoicePackage()
         );
     }
 }

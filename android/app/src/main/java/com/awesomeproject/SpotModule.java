@@ -105,6 +105,38 @@ public class SpotModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void search(final String term, final Promise promise){
+        if (!checkController(promise)){
+            return;
+        }
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    promise.resolve(mService.mController.SearchJson(term));
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
+    }
+
+    @ReactMethod
+    public void suggest(final String term, final Promise promise){
+        if (!checkController(promise)){
+            return;
+        }
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    promise.resolve(mService.mController.SuggestJson(term));
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
+    }
+
+    @ReactMethod
     public void listMdnsDevices(Promise promise){
         if (!checkController(promise)){
             return;

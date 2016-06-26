@@ -1,12 +1,24 @@
 /* @flow */
+
 import {
   NativeModules,
   DeviceEventEmitter
 } from 'react-native'
 
-const spotcontrol = NativeModules.SpotAndroid;
+type deviceTyp = Object
 
-let SpotDevices = [];
+const spotcontrol : {
+  login: (username: string, passowrd: string) => Promise<string>,
+  loginBlob: (username: string, blob: string) => Promise<string>,
+  startDiscovery: () => Promise<string>,
+  getDevices: () => Promise<string>,
+  listMdnsDevices: () => Promise<string>,
+  hello: () => Promise<string>,
+  search: (term: string) => Promise<string>,
+  suggest: (term: string) => Promise<string>
+} = NativeModules.SpotAndroid;
+
+let SpotDevices : Array<deviceTyp> = [];
 
 DeviceEventEmitter.addListener('SpotDeviceNotify', (data) => {
   var update = JSON.parse(data);
@@ -67,4 +79,4 @@ spotcontrol.getDevices = function() {
   });
 }
 
-export default spotcontrol;
+export default spotcontrol
