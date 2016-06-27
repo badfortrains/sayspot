@@ -1,4 +1,5 @@
 /* @flow */
+import type { SearchResult, SuggestResult } from '../spotcontrol'
 
 type asyncAction<actionType: string, T> =
 	{type: actionType, payload?: T, status?: string, error?: Error, meta?: Promise<T>}
@@ -30,4 +31,17 @@ type navigateToAction = syncAction<'NAVIGATE_TO', navigatePayload>
 export const NAVIGATE_BACK = 'NAVIGATE_BACK'
 type navigateBackAction = syncAction<'NAVIGATE_BACK', noPayload>
 
-export type allActions =loginPasswordAction |loginDiscoveryAction | toggleSettingsAction | navigateToAction | navigateBackAction;
+export const SPOT_SEARCH = 'SPOT_SEARCH'
+type spotSearchAction = asyncAction<'SPOT_SEARCH', SearchResult>
+
+export const SPOT_SUGGEST = 'SPOT_SUGGEST'
+type spotSuggestAction = asyncAction<'SPOT_SUGGEST', SuggestResult>
+
+export type allActions =
+		loginPasswordAction |
+		loginDiscoveryAction |
+		toggleSettingsAction |
+		navigateToAction |
+		navigateBackAction |
+		spotSearchAction |
+		spotSuggestAction;

@@ -4,6 +4,7 @@ import { createStore, combineReducers, applyMiddleware } from 'redux'
 import React, { Component } from 'react'
 import Route from './navigator'
 import reducer from '../reducers/index'
+import { loginCache } from '../actions/settings'
 
 import { asyncMiddleware } from '../actions/shared.js'
 
@@ -21,11 +22,10 @@ let store = createStore(reducer, {
   },
   applyMiddleware(
     asyncMiddleware,
-    //logger
+    logger
   ))
 
-
-
+//store.dispatch(loginCache())
 export default class Root extends Component {
   render() {
     return (

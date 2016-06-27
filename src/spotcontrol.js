@@ -7,15 +7,69 @@ import {
 
 type deviceTyp = Object
 
+export type Artist = {
+  image: string,
+  name: string,
+  uri: string,
+  log?:  {
+    top_hit: string
+  }
+}
+
+export type Album = {
+  image: string,
+  name: string,
+  uri: string,
+  artists: Array<Artist>,
+  log?:  {
+    top_hit: string
+  }
+}
+
+export type Track = {
+  album: Album,
+  artists: Array<Artist>,
+  image: string,
+  name: string,
+  uri: string,
+  duration: number,
+  popularity: number,
+  log?:  {
+    top_hit: string
+  }
+}
+export type SearchResult = {
+  artists: {
+    hits: Array<Artist>,
+    total: number
+  },
+  albums: {
+    hits: Array<Album>,
+    total: number
+  },
+  tracks: {
+    hits: Array<Track>,
+    total: number
+  }
+}
+
+export type SuggestResult = {
+  Albums: Array<Album>,
+  Artists: Array<Artist>,
+  Tracks: Array<Track>,
+  TopHists: Array<Album | Artist | Track>
+}
+
+
 const spotcontrol : {
   login: (username: string, passowrd: string) => Promise<string>,
   loginBlob: (username: string, blob: string) => Promise<string>,
-  startDiscovery: () => Promise<string>,
+  startDiscovery: () => Promise<{username: string, blob: string}>,
   getDevices: () => Promise<string>,
   listMdnsDevices: () => Promise<string>,
   hello: () => Promise<string>,
-  search: (term: string) => Promise<string>,
-  suggest: (term: string) => Promise<string>
+  doSearch: (term: string) => Promise<SearchResult>,
+  doSuggest: (term: string) => Promise<SuggestResult>
 } = NativeModules.SpotAndroid;
 
 let SpotDevices : Array<deviceTyp> = [];
@@ -42,6 +96,16 @@ DeviceEventEmitter.addListener('SpotDeviceNotify', (data) => {
   }
 
 });
+
+spotcontrol.doSearch = function(term: string) : Promise<SearchResult> {
+  return NativeModules.SpotAndroid.search(term)
+      .then(res => JSON.parse(res))
+}
+
+spotcontrol.doSuggest = function(term: string) : Promise<SuggestResult> {
+  return NativeModules.SpotAndroid.search(term)
+      .then(res => JSON.parse(res))
+}
 
 spotcontrol.getDevices = function() {
   console.log("get devices")

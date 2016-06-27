@@ -32,11 +32,7 @@ class MyRouter extends Component {
 
   _renderScene(sceneProps: Object): ReactElement<any> {
     let Item = sceneProps.scene.route.key === "settings" ? Settings : Home
-    return (
-      <View>
-        <Item></Item>
-      </View>
-    );
+    return (<Item style={styles.navigator}></Item>);
   }
 
   handleBackAction(): boolean {
