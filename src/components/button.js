@@ -1,17 +1,16 @@
 import {
   Text,
   View,
-  TouchableNativeFeedback
+  TouchableHighlight
 } from 'react-native';
 
 import React from 'react'
 
 export default (props) =>  (
-  <TouchableNativeFeedback
-    onPress={props.onClick}
-    background={TouchableNativeFeedback.SelectableBackground()}>
+  <TouchableHighlight
+    onPress={props.onClick}>
     <View style={{width: 150, height: 50}}>
       <Text>{props.text}</Text>
     </View>
-  </TouchableNativeFeedback>
+  </TouchableHighlight>
 );

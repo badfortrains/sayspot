@@ -1,5 +1,5 @@
 // @flow
-import { NavigationExperimental } from 'react-native'
+import * as NavigationExperimental from '../lib/NavigationExperimental'
 import type { allActions, navigatePayload } from '../constants/actionTypes.js'
 import { SPOT_SEARCH, SPOT_SUGGEST } from '../constants/actionTypes.js'
 

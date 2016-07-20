@@ -2,7 +2,7 @@
 
 'use strict';
 import React, { Component } from 'react'
-import { View } from 'react-native'
+import ReactNative, { View }  from 'react-native'
 import Root from './containers/root'
 
 class AwesomeProject extends Component{
@@ -13,4 +13,6 @@ class AwesomeProject extends Component{
   }
 }
 
-ReactNative.render(<AwesomeProject />, document.getElementById('react-app-header'))
+$(document).on("ready", function(){
+  ReactNative.render(<AwesomeProject />, document.getElementById('react-app-header'))
+})

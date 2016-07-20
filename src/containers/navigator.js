@@ -1,7 +1,8 @@
 // @flow
 
-import React, { Component } from 'react';
-import { View, NavigationExperimental, StyleSheet, Text } from 'react-native';
+import React, { Component } from 'react'
+import * as NavigationExperimental from '../lib/NavigationExperimental'
+import { View, StyleSheet, Text } from 'react-native'
 import Home from '../components/home'
 import Settings from './settings'
 import { bindActionCreators } from 'redux'

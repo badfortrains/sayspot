@@ -12,6 +12,9 @@ import {
   ScrollView,
 } from 'react-native';
 
+import ImageChrome from './imageChrome'
+
+import shallowCompare from 'react-addons-shallow-compare'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as searchActions from '../actions/metadata'
@@ -20,32 +23,32 @@ import type { Album, Artist, Track, SearchResult} from '../spotcontrol'
 
 const AlbumRow = (props: Album) => (
   <View style={styles.albumContainer}>
-    {props.uri ?
-      <Image source={{uri: props.image}}
+    {props.Uri ?
+      <ImageChrome source={{uri: props.Image}}
         style={{width: 50, height: 50}}/>
       :
       null
     }
     <View style={styles.rightContainer}>
       <Text style={styles.title}>
-        {props.name}
+        {props.Name}
       </Text>
-      <Text style={styles.subtitle}>{props.artists[0].name}</Text>
+      <Text style={styles.subtitle}>{props.Artists[0].Name}</Text>
     </View>
   </View>
 )
 
 const ArtistRow = (props: Artist) => (
   <View style={styles.albumContainer}>
-    {props.uri ?
-      <Image source={{uri: props.image}}
+    {props.Uri ?
+      <ImageChrome source={{uri: props.Image}}
         style={{width: 50, height: 50}}/>
       :
       null
     }
     <View style={styles.rightContainer}>
       <Text style={styles.title}>
-        {props.name}
+        {props.Name}
       </Text>
     </View>
   </View>
@@ -54,25 +57,35 @@ const ArtistRow = (props: Artist) => (
 const TrackRow = (props: Track) => (
   <View style={styles.albumContainer}>
     <View style={styles.rightContainer}>
-      <Text style={styles.title}>
-        {props.name}
+      <Text style={styles.Title}>
+        {props.Name}
       </Text>
       <Text style={styles.subtitle}>
-        {props.artists[0].name} - {props.album.name}
+        {props.Artists[0].Name} - {props.Album.Name}
       </Text>
     </View>
   </View>
 )
 
-const SearchResults = (props: SearchResult) => (
-  <ScrollView style={styles.listContainer}>
-    <View>
-      {props.artists.hits.map(a => <ArtistRow key={a.uri} {...a}></ArtistRow>)}
-      {props.albums.hits.map(a => <AlbumRow key={a.uri} {...a}></AlbumRow>)}
-      {props.tracks.hits.map(t => <TrackRow key={t.uri} {...t}></TrackRow>)}
-   </View>
-  </ScrollView>
-)
+class SearchResults extends Component{
+  props: SearchResult
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
+  }
+
+  render() {
+    return (
+      <ScrollView style={styles.listContainer}>
+        <View>
+          {this.props.Artists.Hits.map(a => <ArtistRow key={a.Uri} {...a}></ArtistRow>)}
+          {this.props.Albums.Hits.map(a => <AlbumRow key={a.Uri} {...a}></AlbumRow>)}
+          {this.props.Tracks.Hits.map(t => <TrackRow key={t.Uri} {...t}></TrackRow>)}
+       </View>
+      </ScrollView>
+    );
+  }
+}
 
 class Search extends Component {
   state: {
