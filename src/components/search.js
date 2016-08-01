@@ -5,26 +5,25 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   TextInput,
   TouchableHighlight,
   ListView,
   ScrollView,
 } from 'react-native';
 
-import ImageChrome from './imageChrome'
+import Image from 'imageShared'
 
 import shallowCompare from 'react-addons-shallow-compare'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as searchActions from '../actions/metadata'
 
-import type { Album, Artist, Track, SearchResult} from '../spotcontrol'
+import type { Album, Artist, Track, SearchResult} from 'spotcontrol'
 
 const AlbumRow = (props: Album) => (
   <View style={styles.albumContainer}>
     {props.Uri ?
-      <ImageChrome source={{uri: props.Image}}
+      <Image source={{uri: props.Image}}
         style={{width: 50, height: 50}}/>
       :
       null
@@ -33,7 +32,10 @@ const AlbumRow = (props: Album) => (
       <Text style={styles.title}>
         {props.Name}
       </Text>
-      <Text style={styles.subtitle}>{props.Artists[0].Name}</Text>
+      {props.Artists ?
+        <Text style={styles.subtitle}>{props.Artists[0].Name}</Text>
+        : null
+      }
     </View>
   </View>
 )
@@ -41,7 +43,7 @@ const AlbumRow = (props: Album) => (
 const ArtistRow = (props: Artist) => (
   <View style={styles.albumContainer}>
     {props.Uri ?
-      <ImageChrome source={{uri: props.Image}}
+      <Image source={{uri: props.Image}}
         style={{width: 50, height: 50}}/>
       :
       null
@@ -66,6 +68,43 @@ const TrackRow = (props: Track) => (
     </View>
   </View>
 )
+
+class SuggestResult extends Component{
+  props: SuggestResult
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
+  }
+
+ _renderTopHit(hit: Artist | Album | Track){
+    const type = hit.Log.TopHit
+    if(type == "artists"){
+      return <ArtistRow key={hit.Uri} {...hit}></ArtistRow>
+    }else if(type == "albums"){
+      return <AlbumRow key={hit.Uri} {...hit}></AlbumRow>
+    }else if(type == "tracks"){
+      return <TrackRow key={hit.Uri} {...hit}></TrackRow>
+    }
+  }
+
+  render() {
+    return (
+      <ScrollView style={styles.listContainer}>
+        <View>
+          <Text>Top Hit</Text>
+          {this._renderTopHit(this.props.TopHits[0])}
+          <Text>Artists</Text>
+          {this.props.Artists.map(a => <ArtistRow key={a.Uri} {...a}></ArtistRow>)}
+          <Text>Albums</Text>
+          {this.props.Albums.map(a => <AlbumRow key={a.Uri} {...a}></AlbumRow>)}
+          <Text>Tracks</Text>
+          {this.props.Tracks.map(t => <TrackRow key={t.Uri} {...t}></TrackRow>)}
+       </View>
+      </ScrollView>
+    );
+  }
+
+}
 
 class SearchResults extends Component{
   props: SearchResult
@@ -129,8 +168,13 @@ class Search extends Component {
             Speak
           </Text>
         </TouchableHighlight>
+        {this.props.suggestResult ?
+          <SuggestResult {...this.props.suggestResult}></SuggestResult>
+          :
+          null
+        }
         {this.props.searchResult ?
-          <SearchResults {...this.props.searchResult}></SearchResults>
+          <SuggestResult {...this.props.searchResult}></SuggestResult>
           :
           null
         }
@@ -149,7 +193,7 @@ class Search extends Component {
   }
 
   onPress() {
-    this.props.actions.spotSearch(this.state.text)
+    this.props.actions.spotSuggest(this.state.text)
     // var ident = this.props.ident
     //
     // getBest(this.state.text).then((data) => {
@@ -240,7 +284,8 @@ const styles = StyleSheet.create({
 
 function mapStateToProps(state) {
   return {
-    searchResult: state.search.search
+    searchResult: state.search.search,
+    suggestResult: state.search.suggest,
   }
 }
 

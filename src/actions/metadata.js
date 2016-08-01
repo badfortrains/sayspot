@@ -1,6 +1,6 @@
 /* @flow */
 
-import spotcontrol from '../spotcontrol'
+import spotcontrol from 'spotcontrol'
 import * as types from '../constants/actionTypes'
 import type { allActions } from '../constants/actionTypes'
 

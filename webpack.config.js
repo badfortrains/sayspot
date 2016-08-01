@@ -1,21 +1,24 @@
- module.exports = {
-     entry: './src/app.js',
-     output: {
-         path: './bin',
-         filename: 'app.bundle.js'
-     },
-     resolve: {
-       alias: {
-         'react-native': 'react-native-web'
-       }
-     },
-     module: {
-       loaders: [
-         {
-           test: /\.js$/,
-           exclude: /(node_modules|bower_components)/,
-           loader: 'babel', // 'babel-loader' is also a legal name to reference
-         }
-       ]
+var path = require( 'path' );
+module.exports = {
+   devtool: '#inline-source-map',
+   entry: './src/app.js',
+   output: {
+       path: './bin',
+       filename: 'app.bundle.js'
+   },
+   resolve: {
+     alias: {
+       'react-native': 'react-native-web',
+       'spotcontrol': path.resolve( __dirname, 'src', 'spotcontrol_web.js')
      }
- };
+   },
+   module: {
+     loaders: [
+       {
+         test: /\.js$/,
+         exclude: /(node_modules|bower_components)/,
+         loader: 'babel', // 'babel-loader' is also a legal name to reference
+       }
+     ]
+   }
+};

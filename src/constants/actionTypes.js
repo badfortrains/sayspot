@@ -1,5 +1,5 @@
 /* @flow */
-import type { SearchResult, SuggestResult } from '../spotcontrol'
+import type { SearchResult, SuggestResult } from 'spotcontrol'
 
 type asyncAction<actionType: string, T> =
 	{type: actionType, payload?: T, status?: string, error?: Error, meta: Promise<T>}

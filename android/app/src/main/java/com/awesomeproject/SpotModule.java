@@ -164,8 +164,13 @@ public class SpotModule extends ReactContextBaseJavaModule {
         if (!checkController(promise)){
             return;
         }
-        mService.mController.LoadTrackIds(ident, tracks);
-        promise.resolve("true");
+        try {
+            mService.mController.LoadTrackIds(ident, tracks);
+            promise.resolve("true");
+        } catch(Exception e){
+            promise.reject(e);
+        }
+
     }
 
     @ReactMethod
@@ -198,8 +203,12 @@ public class SpotModule extends ReactContextBaseJavaModule {
             return;
         }
         Log.i(TAG, "Spot play");
-        mService.mController.SendPlay(ident);
-        promise.resolve("true");
+        try {
+            mService.mController.SendPlay(ident);
+            promise.resolve("true");
+        } catch (Exception e) {
+            promise.reject(e);
+        }
     }
 
     @ReactMethod
@@ -207,9 +216,12 @@ public class SpotModule extends ReactContextBaseJavaModule {
         if (!checkController(promise)){
             return;
         }
-        Log.i(TAG, "Spot play");
-        mService.mController.SendHello();
-        promise.resolve("true");
+        try {
+            mService.mController.SendHello();
+            promise.resolve("true");
+        } catch (Exception e) {
+            promise.reject(e);
+        }
     }
 
 
@@ -218,9 +230,12 @@ public class SpotModule extends ReactContextBaseJavaModule {
         if (!checkController(promise)){
             return;
         }
-        Log.i(TAG, "Spot pause");
-        mService.mController.SendPause(ident);
-        promise.resolve("true");
+        try {
+            mService.mController.SendPause(ident);
+            promise.resolve("true");
+        } catch (Exception e) {
+            promise.reject(e);
+        }
     }
 
     @ReactMethod
