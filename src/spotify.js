@@ -43,6 +43,71 @@ function getEditDistance(a, b){
   return matrix[b.length][a.length];
 };
 
+export type ImageType = {
+  height: number,
+  width: number,
+  url: string
+};
+
+export type Track = {
+  album: Album,
+  artists: Array<Artist>,
+  available_markets: Array<string>,
+  disc_number: number,
+  duration_ms: number,
+  explicit: boolean,
+  id: string,
+  name: string,
+  popularity: string,
+  track_number: number
+}
+
+export type Album = {
+  album_type: "album" | "single" | "compilation",
+  available_markets: Array<string>,
+  id: string,
+  images: Array<ImageType>,
+  name: string
+}
+
+export type PageingRes<T> = {
+  items: Array<T>,
+  limit: number,
+  next: string,
+  offset: number,
+  previous: string,
+  total: number
+}
+
+export type Artist = {
+  id: string,
+  images: Array<ImageType>,
+  name: string,
+  popularity: number
+}
+
+export type FullArtist = {
+  artist: Artist,
+  albums: PageingRes<Album>,
+  topTracks: Array<Track>
+}
+
+export function getArtist(artist: string) : Promise<FullArtist> {
+  const artistUrl = `https://api.spotify.com/v1/artists/${artist}`;
+  const atistTrackUrl = `https://api.spotify.com/v1/artists/${artist}/top-tracks?country=US`;
+  const artistAlbums = `https://api.spotify.com/v1/artists/${artist}/albums?market=US`;
+
+  return Promise.all([
+    fetch(artistUrl).then(res => res.json()),
+    fetch(atistTrackUrl).then(res => res.json()),
+    fetch(artistAlbums).then(res => res.json())
+  ]).then(([artist, tracks, albums]) => ({
+    artist: artist,
+    topTracks: tracks,
+    albums: albums
+  }));
+}
+
 export function getAlbumTracks(album : {id: string}) : Object{
   var url = `https://api.spotify.com/v1/albums/${album.id}?market=US`
   console.log(url)

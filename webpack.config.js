@@ -9,7 +9,8 @@ module.exports = {
    resolve: {
      alias: {
        'react-native': 'react-native-web',
-       'spotcontrol': path.resolve( __dirname, 'src', 'spotcontrol_web.js')
+       'spotcontrol': path.resolve( __dirname, 'src', 'spotcontrol_web.js'),
+       'imageShared': path.resolve( __dirname, 'src', 'components', 'imageChrome.js')
      }
    },
    module: {

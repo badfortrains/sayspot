@@ -16,7 +16,7 @@ export type Artist = {
   Name: string,
   Uri: string,
   Log?:  {
-    top_hit: "artists"
+    TopHit: "artists"
   }
 }
 
@@ -26,7 +26,7 @@ export type Album = {
   Uri: string,
   Artists?: Array<Artist>,
   Log?:  {
-    top_hit: "albums"
+    TopHit: "albums"
   }
 }
 
@@ -61,7 +61,7 @@ export type SuggestResult = {
   Albums: Array<Album>,
   Artists: Array<Artist>,
   Tracks: Array<Track>,
-  TopHists: Array<Album | Artist | Track>
+  TopHits: Array<Album | Artist | Track>
 }
 
 
@@ -110,7 +110,7 @@ spotcontrol.doSearch = function(term: string) : Promise<SearchResult> {
 }
 
 spotcontrol.doSuggest = function(term: string) : Promise<SuggestResult> {
-  return NativeModules.SpotAndroid.search(term)
+  return NativeModules.SpotAndroid.suggest(term)
       .then(res => JSON.parse(res))
 }
 

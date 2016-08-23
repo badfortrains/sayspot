@@ -1,5 +1,6 @@
 /* @flow */
 import type { SearchResult, SuggestResult } from 'spotcontrol'
+import type { FullArtist } from '../spotify'
 
 type asyncAction<actionType: string, T> =
 	{type: actionType, payload?: T, status?: string, error?: Error, meta: Promise<T>}
@@ -37,6 +38,9 @@ type spotSearchAction = asyncAction<'SPOT_SEARCH', SearchResult>
 export const SPOT_SUGGEST = 'SPOT_SUGGEST'
 type spotSuggestAction = asyncAction<'SPOT_SUGGEST', SuggestResult>
 
+export const SPOT_ARTIST = 'SPOT_ARTIST'
+export type spotArtistAction = asyncAction<'SPOT_ARTIST', FullArtist>
+
 export type allActions =
 		loginPasswordAction |
 		loginDiscoveryAction |
@@ -44,4 +48,5 @@ export type allActions =
 		navigateToAction |
 		navigateBackAction |
 		spotSearchAction |
-		spotSuggestAction;
+		spotSuggestAction |
+		spotArtistAction;

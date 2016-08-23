@@ -3,7 +3,7 @@ import * as types from '../constants/actionTypes'
 import type { allActions } from '../constants/actionTypes'
 import type { navigatePayload } from '../constants/actionTypes'
 
-export const navigateTo = (route: {key: string}) : allActions => {
+export const navigateTo = (route: {key: string, params?: Object}) : allActions => {
   console.log("navigate to")
   return {
     type: types.NAVIGATE_TO,

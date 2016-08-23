@@ -13,4 +13,5 @@ export const asyncMiddleware = (store: Object): Function =>
 	payloadPromise.then(payload =>
 		store.dispatch({type: action.type,payload: payload,status: 'success'}))
 	.catch(err => store.dispatch({type: action.type, status: 'error', error: err}))
+	return action;
 }

@@ -18,7 +18,9 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as searchActions from '../actions/metadata'
 
-import type { Album, Artist, Track, SearchResult} from 'spotcontrol'
+import { PlainLink } from '../containers/navLink'
+
+import type { Album, Artist, Track, SearchResult, SuggestResult} from 'spotcontrol'
 
 const AlbumRow = (props: Album) => (
   <View style={styles.albumContainer}>
@@ -41,19 +43,21 @@ const AlbumRow = (props: Album) => (
 )
 
 const ArtistRow = (props: Artist) => (
-  <View style={styles.albumContainer}>
-    {props.Uri ?
-      <Image source={{uri: props.Image}}
-        style={{width: 50, height: 50}}/>
-      :
-      null
-    }
-    <View style={styles.rightContainer}>
-      <Text style={styles.title}>
-        {props.Name}
-      </Text>
+  <PlainLink link="artist" params={{id: props.Uri.split(':')[2]}}>
+    <View style={styles.albumContainer}>
+      {props.Uri ?
+        <Image source={{uri: props.Image}}
+          style={{width: 50, height: 50}}/>
+        :
+        null
+      }
+      <View style={styles.rightContainer}>
+        <Text style={styles.title}>
+          {props.Name}
+        </Text>
+      </View>
     </View>
-  </View>
+  </PlainLink>
 )
 
 const TrackRow = (props: Track) => (
@@ -69,7 +73,7 @@ const TrackRow = (props: Track) => (
   </View>
 )
 
-class SuggestResult extends Component{
+class SuggestResultList extends Component{
   props: SuggestResult
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -106,7 +110,7 @@ class SuggestResult extends Component{
 
 }
 
-class SearchResults extends Component{
+class SearchResultList extends Component{
   props: SearchResult
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -169,12 +173,12 @@ class Search extends Component {
           </Text>
         </TouchableHighlight>
         {this.props.suggestResult ?
-          <SuggestResult {...this.props.suggestResult}></SuggestResult>
+          <SuggestResultList {...this.props.suggestResult}></SuggestResultList>
           :
           null
         }
         {this.props.searchResult ?
-          <SuggestResult {...this.props.searchResult}></SuggestResult>
+          <SearchResultList {...this.props.searchResult}></SearchResultList>
           :
           null
         }
